@@ -28,3 +28,4 @@ def predecir(data: EntradaModelo):
 @app.get("/")
 def saludo():
       print("hola")
+      return {"mensaje": "Hola Mundo desde FastAPI en EC2"}
