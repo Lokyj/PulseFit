@@ -24,3 +24,7 @@ def predecir(data: EntradaModelo):
     prediccion = modelo.predict(entrada)
     # Convertimos a lista de floats con redondeo
     return {"prediccion": prediccion[0].tolist()}
+
+@app.get("/")
+def saludo():
+      print("hola")
