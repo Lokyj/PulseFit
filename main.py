@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow.keras.models import load_model
 
 # Cargar modelo una vez al iniciar
-modelo = load_model("modelo_entrenado.keras")
+modelo = load_model("modelo_entrenado2.keras")
 
 # Crear instancia de FastAPI
 app = FastAPI()
