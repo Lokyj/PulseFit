@@ -94,7 +94,7 @@ class UserDataResponse(BaseModel):
     ultima_fc_reposo: int | None
 
 
-@app.get("/userData/{user_id}", response_model=UserDataResponse)
+@app.get("/userData/{user_id}")
 def get_user_data(user_id: int):
     conn = get_conn()
     cursor = conn.cursor()
@@ -133,7 +133,7 @@ def get_user_data(user_id: int):
 
     cursor.close()
 
-    return UserDataResponse{
+    return {
         "nombre":user_row[0],
         "edad":user_row[1],
         "dias_login":user_row[2],
