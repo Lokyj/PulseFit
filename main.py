@@ -120,7 +120,7 @@ def get_user_data(user_id: int):
     # FC en repeticiones
     cursor.execute("""
         SELECT fecha, fc_rep 
-        FROM fc_rep 
+        FROM fc_avg_reposo 
         WHERE user_id = %s
         ORDER BY fecha
     """, (user_id,))
@@ -136,7 +136,7 @@ def get_user_data(user_id: int):
         fc_avg=fc_avg,
         fc_rep=fc_rep
     )
-    
+
 @app.get("/")
 def saludo():
       print("hola")
