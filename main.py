@@ -93,6 +93,7 @@ class UserDataResponse(BaseModel):
 
 @app.get("/userData/{user_id}", response_model=UserDataResponse)
 def get_user_data(user_id: int):
+    conn = get_conn()
     cursor = conn.cursor()
     cursor.execute("""
         SELECT nombre, edad, dias_login, imc 
@@ -111,7 +112,7 @@ def get_user_data(user_id: int):
         dias_login=row[2],
         imc=float(row[3]) if row[3] is not None else 0.0
     )
-    
+
 @app.get("/")
 def saludo():
       print("hola")
