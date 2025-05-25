@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow.keras.models import load_model
 import psycopg2
 # Cargar modelo una vez al iniciar
-modelo = load_model("modelo_bueno_xfavor.keras")
+modelo = load_model("modelo_bueno.keras")
 
 # Crear instancia de FastAPI
 app = FastAPI()
