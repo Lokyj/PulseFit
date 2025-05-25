@@ -134,10 +134,10 @@ def get_user_data(user_id: int):
     cursor.close()
 
     return {
-        "nombre":user_row[0],
-        "edad":user_row[1],
-        "dias_login":user_row[2],
-        "imc":float(user_row[3]) if user_row[3] is not None else 0.0,
+        "nombre":row[0],
+        "edad":row[1],
+        "dias_login":row[2],
+        "imc":float(row[3]) if [3] is not None else 0.0,
         "ultima_fc_rutina":rutina_row[0] if rutina_row else None,
         "ultima_fc_reposo":reposo_row[0] if reposo_row else None
     }
