@@ -95,24 +95,48 @@ class UserDataResponse(BaseModel):
 def get_user_data(user_id: int):
     conn = get_conn()
     cursor = conn.cursor()
+
+    # Datos del usuario
     cursor.execute("""
         SELECT nombre, edad, dias_login, imc 
         FROM users 
         WHERE user_id = %s
     """, (user_id,))
     row = cursor.fetchone()
-    cursor.close()
 
     if row is None:
+        cursor.close()
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    # FC promedio rutina
+    cursor.execute("""
+        SELECT fecha, fc_avg 
+        FROM fc_avg_rutina 
+        WHERE user_id = %s
+        ORDER BY fecha
+    """, (user_id,))
+    fc_avg = [{"fecha": str(r[0]), "valor": float(r[1])} for r in cursor.fetchall()]
+
+    # FC en repeticiones
+    cursor.execute("""
+        SELECT fecha, fc_rep 
+        FROM fc_rep 
+        WHERE user_id = %s
+        ORDER BY fecha
+    """, (user_id,))
+    fc_rep = [{"fecha": str(r[0]), "valor": float(r[1])} for r in cursor.fetchall()]
+
+    cursor.close()
 
     return UserDataResponse(
         nombre=row[0],
         edad=row[1],
         dias_login=row[2],
-        imc=float(row[3]) if row[3] is not None else 0.0
+        imc=float(row[3]) if row[3] is not None else 0.0,
+        fc_avg=fc_avg,
+        fc_rep=fc_rep
     )
-
+    
 @app.get("/")
 def saludo():
       print("hola")
