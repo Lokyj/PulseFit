@@ -133,8 +133,8 @@ def get_user_data(user_id: int):
         edad=row[1],
         dias_login=row[2],
         imc=float(row[3]) if row[3] is not None else 0.0,
-        fc_avg,
-        fc_rep
+        fc_avg=fc_avg,
+        fc_rep=fc_rep
     )
 
 @app.get("/")
