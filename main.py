@@ -11,11 +11,11 @@ app = FastAPI()
 
 # Definir la estructura de los datos de entrada
 class EntradaModelo(BaseModel):
-    edad: float
+    edad: int
     fc_reposo: float
     fc_promedio: float
     imc: float
-    dias_entrenando: float
+    dias_entrenando: int
 
 @app.post("/predecir")
 def predecir(data: EntradaModelo):
