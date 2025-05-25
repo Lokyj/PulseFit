@@ -115,7 +115,7 @@ def get_user_data(user_id: int):
     cursor.execute("""
         SELECT fc_avg
         FROM fc_avg_rutina
-        WHERE id_user = %s
+        WHERE user_id = %s
         ORDER BY fecha DESC
         LIMIT 1
     """, (user_id,))
@@ -125,7 +125,7 @@ def get_user_data(user_id: int):
     cursor.execute("""
         SELECT fc_rep
         FROM fc_avg_reposo
-        WHERE id_user = %s
+        WHERE user_id = %s
         ORDER BY fecha DESC
         LIMIT 1
     """, (user_id,))
@@ -133,14 +133,14 @@ def get_user_data(user_id: int):
 
     cursor.close()
 
-    return UserDataResponse(
-        nombre=user_row[0],
-        edad=user_row[1],
-        dias_login=user_row[2],
-        imc=float(user_row[3]) if user_row[3] is not None else 0.0,
-        ultima_fc_rutina=rutina_row[0] if rutina_row else None,
-        ultima_fc_reposo=reposo_row[0] if reposo_row else None
-    )
+    return UserDataResponse{
+        "nombre"=user_row[0],
+        "edad"=user_row[1],
+        "dias_login"=user_row[2],
+        "imc"=float(user_row[3]) if user_row[3] is not None else 0.0,
+        "ultima_fc_rutina"=rutina_row[0] if rutina_row else None,
+        "ultima_fc_reposo"=reposo_row[0] if reposo_row else None
+    }
 
 @app.get("/")
 def saludo():
