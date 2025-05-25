@@ -85,6 +85,33 @@ def predecir(data: EntradaModelo):
     return {"prediccion": prediccion[0].tolist(),
             "prediccion_binaria": pred_binaria[0].tolist()}
 
+class UserDataResponse(BaseModel):
+    nombre: str
+    edad: int
+    dias_login: int
+    imc: float
+
+@app.get("/userData/{user_id}", response_model=UserDataResponse)
+def get_user_data(user_id: int):
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT nombre, edad, dias_login, imc 
+        FROM users 
+        WHERE user_id = %s
+    """, (user_id,))
+    row = cursor.fetchone()
+    cursor.close()
+
+    if row is None:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    return UserDataResponse(
+        nombre=row[0],
+        edad=row[1],
+        dias_login=row[2],
+        imc=float(row[3]) if row[3] is not None else 0.0
+    )
+    
 @app.get("/")
 def saludo():
       print("hola")
