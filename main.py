@@ -90,6 +90,9 @@ class UserDataResponse(BaseModel):
     edad: int
     dias_login: int
     imc: float
+    ultima_fc_rutina: int | None
+    ultima_fc_reposo: int | None
+
 
 @app.get("/userData/{user_id}", response_model=UserDataResponse)
 def get_user_data(user_id: int):
@@ -108,33 +111,35 @@ def get_user_data(user_id: int):
         cursor.close()
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    # FC promedio rutina
+     # Obtener última FC en rutina
     cursor.execute("""
-        SELECT fecha, fc_avg 
-        FROM fc_avg_rutina 
-        WHERE user_id = %s
-        ORDER BY fecha
+        SELECT fc_avg
+        FROM fc_avg_rutina
+        WHERE id_user = %s
+        ORDER BY fecha DESC
+        LIMIT 1
     """, (user_id,))
-    fc_avg = [{"fecha": str(r[0]), "valor": float(r[1])} for r in cursor.fetchall()]
+    rutina_row = cursor.fetchone()
 
-    # FC en repeticiones
+    # Obtener última FC en reposo
     cursor.execute("""
-        SELECT fecha, fc_rep 
-        FROM fc_avg_reposo 
-        WHERE user_id = %s
-        ORDER BY fecha
+        SELECT fc_rep
+        FROM fc_avg_reposo
+        WHERE id_user = %s
+        ORDER BY fecha DESC
+        LIMIT 1
     """, (user_id,))
-    fc_rep = [{"fecha": str(r[0]), "valor": float(r[1])} for r in cursor.fetchall()]
+    reposo_row = cursor.fetchone()
 
     cursor.close()
 
     return UserDataResponse(
-        nombre=row[0],
-        edad=row[1],
-        dias_login=row[2],
-        imc=float(row[3]) if row[3] is not None else 0.0,
-        fc_avg=fc_avg,
-        fc_rep=fc_rep
+        nombre=user_row[0],
+        edad=user_row[1],
+        dias_login=user_row[2],
+        imc=float(user_row[3]) if user_row[3] is not None else 0.0,
+        ultima_fc_rutina=rutina_row[0] if rutina_row else None,
+        ultima_fc_reposo=reposo_row[0] if reposo_row else None
     )
 
 @app.get("/")
