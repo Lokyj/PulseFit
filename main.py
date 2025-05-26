@@ -3,9 +3,11 @@ from pydantic import BaseModel, EmailStr
 import numpy as np
 from tensorflow.keras.models import load_model
 import psycopg2
+import joblib
 # Cargar modelo una vez al iniciar
-modelo = load_model("modelo_bueno.keras")
-
+modelo = load_model("modelo_bueno_Scaler.keras")
+# Cargar el scaler
+scaler = joblib.load("scaler_bueno_Scaler.pkl")
 # Crear instancia de FastAPI
 app = FastAPI()
 
@@ -76,8 +78,13 @@ class EntradaModelo(BaseModel):
 def predecir(data: EntradaModelo):
     # Convertir datos a matriz y hacer predicción
     entrada = np.array([[data.edad, data.fc_reposo, data.fc_promedio, data.imc, data.dias_entrenando]])
-    prediccion = modelo.predict(entrada)
-    umbrales = [0.1, 0.005, 0.005, 0.005, 0.005, 0.4]
+    entrada_scaled = scaler.transform(entrada)
+    
+    # Realizar la predicción
+    prediccion = modelo.predict(entrada_scaled)
+
+    # Definir umbrales para cada clase
+    umbrales = [0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
 
     # Aplicar umbrales para obtener predicción binaria
     pred_binaria = (prediccion > umbrales).astype(int)
