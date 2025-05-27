@@ -84,7 +84,7 @@ def predecir(data: EntradaModelo):
     prediccion = modelo.predict(entrada_scaled)
 
     # Definir umbrales para cada clase
-    umbrales = [0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
+    umbrales = [0.8, 0.25, 0.25, 0.8, 0.25, 0.25]
 
     # Aplicar umbrales para obtener predicción binaria
     pred_binaria = (prediccion > umbrales).astype(int)
