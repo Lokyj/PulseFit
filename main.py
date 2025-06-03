@@ -7,7 +7,7 @@ import joblib
 # Cargar modelo una vez al iniciar
 modelo = load_model("modelo_bueno_Scaler.keras")
 # Cargar el scaler
-scaler = joblib.load("scaler_bueno_Scaler.pkl")
+scaler = joblib.load("scaler.pkl")
 # Crear instancia de FastAPI
 app = FastAPI()
 
