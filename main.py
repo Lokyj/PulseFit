@@ -31,25 +31,30 @@ class LoginUser(BaseModel):
 # Registro
 @app.post("/register")
 def register(user: RegisterUser):
-    conn = get_conn()
-    cur = conn.cursor()
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE username = %s OR correo = %s",
+                    (user.username, user.correo))
+        if cur.fetchone():
+            conn.close()
+            raise HTTPException(status_code=400, detail="Usuario o correo ya registrado")
 
-    # Verificar si ya existe username o correo
-    cur.execute("SELECT * FROM users WHERE username = %s OR correo = %s", (user.username, user.correo))
-    if cur.fetchone():
+        cur.execute("""
+            INSERT INTO users (username, correo, password, nombre)
+            VALUES (%s, %s, %s, %s)
+            RETURNING user_id
+        """, (user.username, user.correo, user.password, user.username))
+        user_id = cur.fetchone()[0]
+        conn.commit()
         conn.close()
-        raise HTTPException(status_code=400, detail="Usuario o correo ya registrado")
-
-    # Insertar nuevo usuario
-    cur.execute("""
-        INSERT INTO users (username, correo, password, nombre)
-        VALUES (%s, %s, %s, %s)
-        RETURNING user_id
-    """, (user.username, user.correo, user.password, user.username))
-    user_id = cur.fetchone()[0]
-    conn.commit()
-    conn.close()
-    return {"message": "Usuario registrado correctamente", "user_id": user_id}
+        return {"message": "Usuario registrado correctamente", "user_id": user_id}
+    except HTTPException:
+        # deja pasar las HTTPException que lanzaste tú
+        raise
+    except Exception as e:
+        # captura TODO lo demás y lo devuelve en el body
+        raise HTTPException(status_code=500, detail=f"Error interno: {e}")
 
 # Login
 @app.post("/login")
