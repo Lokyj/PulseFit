@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, EmailStr
 import numpy as np
 from tensorflow.keras.models import load_model
 import psycopg2
 import joblib
+from datetime import date
 # Cargar modelo una vez al iniciar
 modelo = load_model("modelo_bueno_Scaler.keras")
 # Cargar el scaler
@@ -153,6 +154,57 @@ def get_user_data(user_id: int):
         "ultima_fc_rutina":rutina_row[0] if rutina_row else None,
         "ultima_fc_reposo":reposo_row[0] if reposo_row else None
     }
+
+
+class FCRutinaInput(BaseModel):
+    user_id: int
+    fc_avg: float
+
+@app.post("/fc_rutina")
+def registrar_fc_rutina(data: FCRutinaInput):
+    conn = get_conn()
+    cursor = conn.cursor()
+    today = date.today()
+
+    try:
+        cursor.execute("""
+            INSERT INTO fc_avg_rutina (user_id, fecha, fc_avg)
+            VALUES (%s, %s, %s)
+        """, (data.user_id, today, data.fc_avg))
+        conn.commit()
+        return {"mensaje": "Frecuencia promedio registrada"}
+
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Error: {e}")
+
+    finally:
+        cursor.close()
+
+class FCReposoInput(BaseModel):
+    user_id: int
+    fc_rep: float
+
+@app.post("/fc_reposo")
+def registrar_fc_reposo(data: FCReposoInput):
+    conn = get_conn()
+    cursor = conn.cursor()
+    today = date.today()
+
+    try:
+        cursor.execute("""
+            INSERT INTO fc_avg_reposo (user_id, fecha, fc_rep)
+            VALUES (%s, %s, %s)
+        """, (data.user_id, today, data.fc_rep))
+        conn.commit()
+        return {"mensaje": "Frecuencia en reposo registrada"}
+
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Error: {e}")
+
+    finally:
+        cursor.close()
 
 @app.get("/")
 def saludo():
