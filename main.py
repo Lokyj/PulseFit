@@ -206,6 +206,34 @@ def registrar_fc_reposo(data: FCReposoInput):
     finally:
         cursor.close()
 
+class InitialData(BaseModel):
+    user_id: int
+    user_height: float
+    user_weight: float
+    user_age: int
+
+@app.post("/initialData")
+def initial_data(user: InitialData):
+    conn = get_conn()
+    cursor = conn.cursor()
+
+    # calcular imc con datos ingresados
+    imc = user.user_weight / (user.user_height ** 2)
+    cursor.execute("""
+        INSERT INTO users (altura, peso, edad, imc, dias_login)
+        VALUES (%s, %s, %s, %s, 0)
+        ON CONFLICT (user_id) DO UPDATE SET
+            altura = EXCLUDED.altura,
+            peso = EXCLUDED.peso,
+            edad = EXCLUDED.edad,
+            imc = EXCLUDED.imc
+    """, (user.user_height, user.user_weight, user.user_age, imc)) 
+
+    conn.commit()
+    conn.close()
+
+    return {"mensaje": "Datos iniciales registrados correctamente"}
+
 @app.get("/")
 def saludo():
       print("hola")
