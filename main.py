@@ -89,12 +89,12 @@ def predecir(data: EntradaModelo):
     # Realizar la predicción
     prediccion = modelo.predict(entrada_scaled)
 
-    # Definir umbrales para cada clase
+    # Definir umbrales para cada etiqueta
     umbrales = [0.8, 0.25, 0.25, 0.8, 0.25, 0.25]
 
     # Aplicar umbrales para obtener predicción binaria
     pred_binaria = (prediccion > umbrales).astype(int)
-    # Convertimos a lista de floats con redondeo
+    
     return {"prediccion": prediccion[0].tolist(),
             "prediccion_binaria": pred_binaria[0].tolist()}
 
