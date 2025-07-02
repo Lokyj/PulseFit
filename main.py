@@ -90,7 +90,7 @@ def predecir(data: EntradaModelo):
     prediccion = modelo.predict(entrada_scaled)
 
     # Definir umbrales para cada etiqueta
-    umbrales = [0.8, 0.25, 0.25, 0.8, 0.25, 0.25]
+    umbrales = [0.5, 0.3, 0.25, 0.5, 0.25, 0.55]
 
     # Aplicar umbrales para obtener predicción binaria
     pred_binaria = (prediccion > umbrales).astype(int)
